@@ -1,0 +1,32 @@
+{
+  "name": "bulk-email-validator",
+  "version": "1.0.0",
+  "description": "Upload CSV to bulk validate email via regex and MX ping",
+  "main": "main.js",
+  "scripts": {
+    "test": "/ping"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Hmachalani/email-validator.git"
+  },
+  "keywords": [
+    "email",
+    "validate",
+    "bulk",
+    "csv"
+  ],
+  "author": "Henri Machalani",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Hmachalani/email-validator/issues"
+  },
+
+  "dependencies": {
+    "email-full-validate" : "*",
+    "fast-csv":"*",
+    "express" : "*",
+    "formidable":"*"
+  },
+  "homepage": "https://github.com/Hmachalani/email-validator#readme"
+}
