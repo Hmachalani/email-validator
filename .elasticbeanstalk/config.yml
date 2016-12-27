@@ -1,5 +1,10 @@
 branch-defaults:
   master:
-    environment: mistplay-email-validator
+    environment: serina-ev-01
 global:
+  application_name: coinpwn
+  default_ec2_keyname: coin-key
+  default_platform: 64bit Amazon Linux 2016.09 v3.3.0 running Node.js
+  default_region: us-west-2
   profile: eb-cli
+  sc: git

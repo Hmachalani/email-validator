@@ -18,6 +18,23 @@ app.get('/', function (req, res) {
 });
 
 
+app.get('/reports', function (req, res) {
+    const uploadsFolder = './uploads/';
+    fs.readdir(uploadsFolder, (err, files) => {
+        var out = [];
+        for (var i in files) {
+            var file = files[i];
+            var uploadPath = path.join(__dirname, '/uploads');
+            var filePath = path.join(__dirname, file);
+            out.push({ name: file, path: filePath });
+        }
+
+        res.send(out);
+
+    })
+});
+
+
 app.post('/upload', function (req, res) {
 
     // create an incoming form object
@@ -32,10 +49,12 @@ app.post('/upload', function (req, res) {
     // every time a file has been uploaded successfully,
     // rename it to it's orignal name
     form.on('file', function (field, file) {
-        var newPath = path.join(form.uploadDir, file.name);
-        fs.rename(file.path, newPath);
+        var filePrefix = file.name.split(".")[0];
+        var readPath = path.join(form.uploadDir, file.name);
+        var writePath = path.join(form.uploadDir, filePrefix + "-validated.csv");
+        fs.rename(file.path, readPath);
 
-        validateEmails(newPath, res);
+        validateEmails(readPath, writePath);
 
     });
 
@@ -54,7 +73,7 @@ app.post('/upload', function (req, res) {
 
 });
 
-var port= process.env.PORT || 8080;
+var port = process.env.PORT || 8080;
 var server = app.listen(port, function () {
     console.log('Server listening on port 8080');
 });
@@ -62,32 +81,39 @@ var server = app.listen(port, function () {
 
 
 
-var validateEmails = function (path, res) {
-    var stream = fs.createReadStream(path);
+var validateEmails = function (readPath, writePath) {
+    var readStream = fs.createReadStream(readPath);
+    var writeStream = fs.createWriteStream(writePath)
+    var csvWriteStream = csv.createWriteStream({ headers: true });
+    csvWriteStream.pipe(writeStream);
 
-    var csvStream = csv()
+    var csvReadStream = csv({ headers: true })
+        .transform(function (data, next) {
+            validateEmail(data, next);
+        })
         .on("data", function (data) {
             console.log(data);
-            var asyncFunctions = [];
-            for (var i = 0; i < data.length; i++) {
-                validateEmail(data[i], res);
-            }
+            csvWriteStream.write(data);
 
         })
-        .on("end", function () {
+        .on("end", function (data) {
             console.log("done");
+            csvWriteStream.end();
         });
 
-    stream.pipe(csvStream);
+    readStream.pipe(csvReadStream);
 
 }
 
 
 
 
-var validateEmail = function (email, res) {
+var validateEmail = function (data, next) {
+    var email = data.email;
     emailExists.check(email, function (err, res) {
-        console.log(email +" valid? "+res);
-        if(err)console.err(err);
+        console.log(email + " valid? " + res);
+        if (err) console.error(err);
+        data.valid = res;
+        next(null, data);
     });
 }

@@ -1,14 +1,14 @@
-$('.upload-btn').on('click', function (){
-    $('#upload-input').click();
-    $('.progress-bar').text('0%');
-    $('.progress-bar').width('0%');
+$('.upload-btn').on('click', function () {
+  $('#upload-input').click();
+  $('.progress-bar').text('0%');
+  $('.progress-bar').width('0%');
 });
 
-$('#upload-input').on('change', function(){
+$('#upload-input').on('change', function () {
 
   var files = $(this).get(0).files;
 
-  if (files.length > 0){
+  if (files.length > 0) {
     // create a FormData object which will be sent as the data payload in the
     // AJAX request
     var formData = new FormData();
@@ -27,15 +27,15 @@ $('#upload-input').on('change', function(){
       data: formData,
       processData: false,
       contentType: false,
-      success: function(data){
-          console.log('upload successful!\n' + data);
+      success: function (data) {
+        console.log('upload successful!\n' + data);
       },
-      xhr: function() {
+      xhr: function () {
         // create an XMLHttpRequest
         var xhr = new XMLHttpRequest();
 
         // listen to the 'progress' event
-        xhr.upload.addEventListener('progress', function(evt) {
+        xhr.upload.addEventListener('progress', function (evt) {
 
           if (evt.lengthComputable) {
             // calculate the percentage of upload completed
@@ -61,3 +61,13 @@ $('#upload-input').on('change', function(){
 
   }
 });
+
+var initTable = function () {
+  var app = angular.module('myApp', []);
+  app.controller('filesCtrl', function ($scope, $http) {
+    $http.get("/reports")
+      .then(function (result) {
+        $scope.files = result.data;
+      });
+  });
+}
