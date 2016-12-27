@@ -1,0 +1,5 @@
+branch-defaults:
+  master:
+    environment: mistplay-email-validator
+global:
+  profile: eb-cli

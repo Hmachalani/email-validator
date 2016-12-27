@@ -4,7 +4,7 @@
   "description": "Upload CSV to bulk validate email via regex and MX ping",
   "main": "main.js",
   "scripts": {
-    "test": "/ping"
+    "start":"node main.js"
   },
   "repository": {
     "type": "git",

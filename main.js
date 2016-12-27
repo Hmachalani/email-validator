@@ -35,7 +35,7 @@ app.post('/upload', function (req, res) {
         var newPath = path.join(form.uploadDir, file.name);
         fs.rename(file.path, newPath);
 
-        validateEmails(newPath);
+        validateEmails(newPath, res);
 
     });
 
@@ -54,22 +54,23 @@ app.post('/upload', function (req, res) {
 
 });
 
-
-var server = app.listen(8080, function () {
+var port= process.env.PORT || 8080;
+var server = app.listen(port, function () {
     console.log('Server listening on port 8080');
 });
 
 
 
 
-var validateEmails = function (path) {
+var validateEmails = function (path, res) {
     var stream = fs.createReadStream(path);
 
     var csvStream = csv()
         .on("data", function (data) {
             console.log(data);
+            var asyncFunctions = [];
             for (var i = 0; i < data.length; i++) {
-                validateEmail(data[i]);
+                validateEmail(data[i], res);
             }
 
         })
@@ -84,7 +85,7 @@ var validateEmails = function (path) {
 
 
 
-var validateEmail = function (email) {
+var validateEmail = function (email, res) {
     emailExists.check(email, function (err, res) {
         console.log(email +" valid? "+res);
         if(err)console.err(err);
