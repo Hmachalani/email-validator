@@ -12,6 +12,8 @@ var fs = require('fs');
 
 
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'public/reports')));
+
 
 app.get('/', function (req, res) {
     res.sendFile(path.join(__dirname, 'views/index.html'));
@@ -19,13 +21,12 @@ app.get('/', function (req, res) {
 
 
 app.get('/reports', function (req, res) {
-    const uploadsFolder = './uploads/';
+    const uploadsFolder = './public/reports/';
     fs.readdir(uploadsFolder, (err, files) => {
         var out = [];
         for (var i in files) {
             var file = files[i];
-            var uploadPath = path.join(__dirname, '/uploads');
-            var filePath = path.join(__dirname, file);
+            var filePath = "./reports/"+file; 
             out.push({ name: file, path: filePath });
         }
 
@@ -45,13 +46,15 @@ app.post('/upload', function (req, res) {
 
     // store all uploads in the /uploads directory
     form.uploadDir = path.join(__dirname, '/uploads');
+    form.publicDir = path.join(__dirname, '/public/reports');
+
 
     // every time a file has been uploaded successfully,
     // rename it to it's orignal name
     form.on('file', function (field, file) {
         var filePrefix = file.name.split(".")[0];
         var readPath = path.join(form.uploadDir, file.name);
-        var writePath = path.join(form.uploadDir, filePrefix + "-validated.csv");
+        var writePath = path.join(form.publicDir, filePrefix + "-validated.csv");
         fs.rename(file.path, readPath);
 
         validateEmails(readPath, writePath);

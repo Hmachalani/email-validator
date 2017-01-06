@@ -28,6 +28,19 @@
             <button class="btn btn-lg upload-btn" type="button">Upload File</button>
           </div>
         </div>
+
+         <div ng-app="myApp" ng-controller="filesCtrl"> 
+
+<table>
+  <tr ng-repeat="file in files">
+    <td>{{ file.name }}</td>
+    <td> <a href="{{ file.path }}">Download</a> </td>
+  </tr>
+</table>
+
+</div>
+
+<!-- end -->
       </div>
     </div>
   </div>
@@ -39,16 +52,7 @@
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
   <script src="javascripts/upload.js"></script>
 
-  <div ng-app="myApp" ng-controller="filesCtrl"> 
-
-<table>
-  <tr ng-repeat="file in files">
-    <td>{{ file.name }}</td>
-    <td> <button ng-click="window.open('{{ file.path }}')">Download report</button> </td>
-  </tr>
-</table>
-
-</div>
+ 
 
 <script>
 
