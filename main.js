@@ -1,5 +1,5 @@
 
-var emailExists = require("email-full-validate"),
+var EmailValidator = require("email-full-validate"),
     csv = require("fast-csv"),
     fs = require('fs');
 
@@ -57,7 +57,7 @@ app.post('/upload', function (req, res) {
         var writePath = path.join(form.publicDir, filePrefix + "-validated.csv");
         fs.rename(file.path, readPath);
 
-        validateEmails(readPath, writePath);
+        parseCSVEmails(readPath, writePath);
 
     });
 
@@ -84,24 +84,25 @@ var server = app.listen(port, function () {
 
 
 
-var validateEmails = function (readPath, writePath) {
+var parseCSVEmails = function (readPath, writePath) {
     var readStream = fs.createReadStream(readPath);
     var writeStream = fs.createWriteStream(writePath)
     var csvWriteStream = csv.createWriteStream({ headers: true });
     csvWriteStream.pipe(writeStream);
 
-    var csvReadStream = csv({ headers: true })
-        .transform(function (data, next) {
-            validateEmail(data, next);
-        })
-        .on("data", function (data) {
-            console.log(data);
-            csvWriteStream.write(data);
+    let emails = [];
 
+    var csvReadStream = csv({ headers: true })
+        .on("data", function (data) {
+            emails.push(data.email);
+           // csvWriteStream.write(data);
         })
         .on("end", function (data) {
             console.log("done");
-            csvWriteStream.end();
+            validateEmails(emails, (result) => {
+                csvWriteStream.write()
+            });
+           // csvWriteStream.end();
         });
 
     readStream.pipe(csvReadStream);
@@ -111,12 +112,14 @@ var validateEmails = function (readPath, writePath) {
 
 
 
-var validateEmail = function (data, next) {
-    var email = data.email;
-    emailExists.check(email, function (err, res) {
-        console.log(email + " valid? " + res);
-        if (err) console.error(err);
-        data.valid = res;
-        next(null, data);
+var validateEmails = function (emails, next) {
+
+    let emailValidator = new EmailValidator(emails);
+
+    emailValidator.validateAll((err, validatedEmails) => {
+        if(err) console.error(err);
+        console.log(JSON.stringify(validatedEmails));
+
     });
+
 }
